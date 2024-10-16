@@ -1,0 +1,611 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h> //ãéá ôç bool
+#include <ctype.h>
+#define STR_SIZE 2009999 //ôï ìÝãéóôï åðéôñåðüìåíï ìÝãåèïò string áíÜ ðëçêôñïëüãçóç
+#include<unistd.h>
+#include <locale.h>
+#include <time.h>
+#include <conio.h> //ãéá íá äïõëåýåé ç áíáæçôçóç óôá åëëçíéêÜ
+
+typedef struct {
+    char name[50];
+    char surname[50];
+    float vGrade;
+    float wGrade;
+    float average;
+} Student;
+
+
+
+const char* dashes = "--------------------------------------------------------------------------------------";
+
+void swapStudents(Student* a, Student* b) 
+{
+    Student temp = *a;
+    *a = *b;
+    *b = temp;
+}
+void checkString(char *msg, char *temp) 
+{
+    bool flag;
+
+    do {
+        flag = true;
+
+        printf("%s", msg);
+        gets(temp);
+
+        if (strlen(temp) == 0) // ¸ëåã÷ïò áí ç åßóïäïò åßíáé êåíÞ
+		{
+            flag = false; // flag false ãéá íá æçôçèåß åê íÝïõ åßóïäïò
+            printf("\n\nÄåí äþóáôå êáìßá åßóïäï!\a\nÐáñáêáëþ ðñïóðáèÞóôå îáíÜ!\n\n");
+        } 
+		else 
+		{
+            for (int i = 0; i < strlen(temp); i++) // ¸ëåã÷ïò êÜèå ÷áñáêôÞñá ôçò åéóüäïõ
+			{
+                if (!isalpha(temp[i])) // Áí ï ÷áñáêôÞñáò äåí åßíáé ãñÜììá
+				{
+					flag = false;
+                    printf("\n\nÄåí ãéíåôáé íá óå ëÝíå %s ...\a\nÐáñáêáëþ ðñïóðáèÞóôå îáíÜ!\n\n",temp);
+                    break;
+				}
+            }
+        }
+
+        if (!flag) // Áí ÷ñåéÜæåôáé íá æçôçèåß åê íÝïõ åßóïäïò, êáèõóôÝñçóç êáé êáèáñéóìüò ôçò ïèüíçò
+		{
+            system("pause");
+            system("cls");
+        }
+
+    } while (!flag); // ÓõíÝ÷éóç ôçò åðáíÜëçøçò åÜí flag åßíáé false
+     
+}
+void printStudent(const Student* students) 
+{
+    int i; //Ôá %-__ åßíáé ãéá ôçí óôïß÷çóç ôïõ êåéìÝíïõ
+	printf("|  %-15s   %-15s   %-15.2f   %-15.2f   %-12.2f|\n", students[i].name, students[i].surname, students[i].vGrade, students[i].wGrade, students[i].average);
+	
+}
+void bubbleSort(Student* students, int numberOfStudents) 
+{
+    for (int i = 0; i < numberOfStudents - 1; i++) {
+        for (int j = 0; j < numberOfStudents - i - 1; j++) {
+            if (students[j].average < students[j + 1].average) {
+                swapStudents(&students[j], &students[j + 1]);
+            }
+        }
+    }
+}
+int intAfterCheck(char *msg)
+{
+	char temp[STR_SIZE];
+	int i, arith;
+	bool flag;
+	
+	do
+	{
+		flag = 1;
+		
+		printf("%s", msg);
+		gets(temp);
+		
+		if(strlen(temp)==0)	//Áí ðáôÞóåé áìÝóùò ENTER
+			flag=0;	//ç flag ãßíåôáé false þóôå íá îáíáæçôÞóåé input
+		
+		else if((temp[0]=='+' || temp[0]=='-') && strlen(temp)==1)
+			flag=0;
+		
+		else if(temp[0]!='+' && temp[0]!='-') //Áí ÄÅÍ ðáôÞóåé ðñþôá + Þ/êáé - íá ôï äå÷ôåß ùò åðéôñåðôü
+		{
+			for(i=0; i<strlen(temp); i++)
+			{
+				if(isdigit(temp[i])!=0) //áí êÜèå ðëÞêôñï åßíáé áðü 0 þò êáé 9 ôüôå ç flag íá ðáñáìåßíåé true
+					flag = flag & 1;//bitwise and (êÜíåé and bit ðñïò bit)
+				else				//áëëéþò íá ãßíåé false
+					flag = flag & 0;//bitwise and (êÜíåé and bit ðñïò bit)
+			}
+		}
+		
+		//Áí äþóåé ++3 Þ +-3 Þ -+3 Þ --3 íá ìçí åðéôñáðåß
+		else if((temp[0]=='+'&&temp[1]=='+')|| (temp[0]=='+'&&temp[1]=='-') || (temp[0]=='-'&&temp[1]=='+') || (temp[0]=='-'&&temp[1]=='-')) //Áí ðáôÞóåé ðñþôá + Þ/êáé - íá ôï äå÷ôåß ùò åðéôñåðôü
+			flag = 0; //ç flag íá ãßíåé false
+		
+		//Áí äþóåé + Þ - óôçí áñ÷Þ áëëÜ ôï äåýôåñï ðëÞêôñï äåí åßíáé ïýôå + ïýôå -	
+		else if((temp[0]=='+'&&temp[1]!='+')|| (temp[0]=='+'&&temp[1]!='-')||(temp[0]=='-'&&temp[1]!='+') || (temp[0]=='-'&&temp[1]!='-')) //Áí ðáôÞóåé ðñþôá + êáé äåí ðáôÞóåé ìåôÜ - (Þ ôï áíÜðïäï) íá ôï äå÷ôåß ùò åðéôñåðôü 
+		{	
+			for(i=1; i<strlen(temp); i++)
+			{
+				if(isdigit(temp[i])!=0) //áí êÜèå ðëÞêôñï åßíáé áðü 0 þò êáé 9 ôüôå ç flag íá ðáñáìåßíåé true
+					flag = flag & 1;//bitwise and (êÜíåé and bit ðñïò bit)
+				else				//áëëéþò íá ãßíåé false
+					flag = flag & 0;//bitwise and (êÜíåé and bit ðñïò bit)
+			}
+		}		
+		
+		if(flag==0) //Áí ç flag Ýãéíå false, ôüôå èá æçôÞóåé åê íÝïõ áñéèìü
+		{
+			printf("\n\nÄåí äþóáôå áñéèìü!\a\nÐáñáêáëþ ðñïóðáèÞóôå îáíÜ!\n\n");
+			system("pause");
+			system("cls");
+		}
+	}while(flag==0); //¼óï ç flag ðáñáìÝíåé false ôï ðñüãñáììá èá æçôÜåé åê íÝïõ áñéèìü
+	
+	return atoi(temp);//Ìüëéò âãåé áðü ôç while óßãïõñá èá Ý÷åé ðÜñåé áñéèìïýò óå üëï ôï string, 
+					  //ïðüôå ìåôáôñÝðïõìå ôï string óå áñéèìü
+}
+float floatAfterCheck(char *msg)
+{
+	char temp[STR_SIZE];
+	int i, count, flag=0;
+	float arith;
+	
+	do
+	{
+		flag=1; //Ç flag åßíáé áñ÷éêÜ true
+		count=0;
+		
+		printf("%s", msg);
+		gets(temp);
+		
+		if(strlen(temp)==0)	//Áí ðáôÞóåé áìÝóùò ENTER
+			flag=0;	//ç flag ãßíåôáé false þóôå íá îáíáæçôÞóåé input
+		else
+		{
+			//Ýëåã÷ïò áí õðÜñ÷ïõí 2 Þ ðåñéóóüôåñåò ôåëåßåò
+			for(i=0; i<strlen(temp)-1; i++)
+				if(temp[i]=='.')
+					count++;
+			
+			if (count>=2)//Áí õðÜñîïõí ôåëåéÝò (.) ðåñéóóüôåñåò ôçò ìßáò, äçëáäÞ áðü 2 êáé ðÜíù,
+				flag=0; //êÜíå ôç flag false
+				
+			if(temp[0] == '.' || temp[strlen(temp)-1] == '.')	//Ýëåã÷ïò áí ç åßóïäïò îåêéíÜ Þ ôåëåéþíåé ìå ôåëåßá(.)
+				flag=0;
+			
+			if((temp[0]=='+' || temp[0]=='-') && strlen(temp)==1)
+				flag=0;
+				
+			if(temp[0]!='+' && temp[0]!='-')
+			{
+				//Ýëåã÷ïò áí üëá ôá õðüëïéðá ðëÞêôñá åßíáé áñéèìïß	
+				if(count<=1)//áí õðÜñ÷åé Þ ìßá Þ êáììßá ôåëåßá (.)
+				{
+					for(i=0; i<strlen(temp); i++)
+					{
+						if(temp[i]=='.')//áí äåéò ïðïéïäÞðïôå ðëÞêôñï ìå ôåëåßá (.)
+							continue;   //áãíüçóå ôï
+						else
+						{
+							if(isdigit(temp[i])!=0) //áí êÜèå ðëÞêôñï åßíáé áðü 0 þò êáé 9 ôüôå ç flag íá ðáñáìåßíåé true
+								flag = flag * 1;//bitwise and (êÜíåé and bit ðñïò bit)
+							else					//áëëéþò íá ãßíåé false
+								flag = flag * 0;//bitwise and (êÜíåé and bit ðñïò bit)
+						}
+					}
+				}	
+			}
+			
+			//Áí äþóåé ++3 Þ +-3 Þ -+3 Þ --3 íá ìçí åðéôñáðåß
+			if((temp[0]=='+'&&temp[1]=='+') || (temp[0]=='+'&&temp[1]=='-') || (temp[0]=='-'&&temp[1]=='+') || (temp[0]=='-'&&temp[1]=='-')) //Áí ðáôÞóåé ðñþôá + Þ/êáé - êáé ìåôÜ + Þ/êáé - íá ìçí ôï äå÷ôåß ùò åðéôñåðôü
+				flag = 0; //ç flag íá ãßíåé false
+			
+			if((temp[0]=='+'&&temp[1]=='.') || (temp[0]=='-'&&temp[1]=='.')) //Áí ðáôÞóåé ðñþôá + Þ/êáé - êáé ìåôÜ . íá ìçí ôï åðéôñÝøåé
+				flag = 0; //ç flag íá ãßíåé false
+				
+			//Áí äþóåé + Þ - óôçí áñ÷Þ áëëÜ ôï äåýôåñï ðëÞêôñï äåí åßíáé ïýôå + ïýôå -	
+			if((temp[0]=='+'&&temp[1]!='+') || (temp[0]=='+'&&temp[1]!='-') || (temp[0]=='-'&&temp[1]!='+') || (temp[0]=='-'&&temp[1]!='-')) //Áí ðáôÞóåé ðñþôá + êáé äåí ðáôÞóåé ìåôÜ - (Þ ôï áíÜðïäï) íá ôï äå÷ôåß ùò åðéôñåðôü 
+			{	
+				for(i=1; i<strlen(temp); i++)
+				{
+					if(temp[i]=='.')//áí äåéò ïðïéïäÞðïôå ðëÞêôñï ìå ôåëåßá (.)
+						continue;   //áãíüçóå ôï
+					else
+					{
+						if(isdigit(temp[i]) != 0) //áí êÜèå ðëÞêôñï åßíáé áðü 0 þò êáé 9 ôüôå ç flag íá ðáñáìåßíåé true
+							flag = flag * 1;//bitwise and (êÜíåé and bit ðñïò bit)
+						else					//áëëéþò íá ãßíåé false
+							flag = flag * 0;//bitwise and (êÜíåé and bit ðñïò bit)
+					}
+				}
+			}
+		}
+		
+		if(flag==0) //Áí ç flag Ýãéíå false, ôüôå èá æçôÞóåé åê íÝïõ áñéèìü
+		{
+			printf("\n\nÄåí äþóáôå áñéèìü! \a\nÐáñáêáëþ ðñïóðáèÞóôå îáíÜ!\n\n");
+			system("pause");
+			system("cls");
+		}
+	}while(flag==0); //¼óï ç flag ðáñáìÝíåé false ôï ðñüãñáììá èá æçôÜåé åê íÝïõ áñéèìü
+	
+	return atof(temp);//Ìüëéò âãåé áðü ôç while óßãïõñá èá Ý÷åé ðÜñåé áñéèìïýò óå üëï ôï string, 
+					  //ïðüôå ìåôáôñÝðïõìå ôï string óå áñéèìü
+}
+void searchForStudentEn(Student students[], int numberOfStudents) 
+{
+	char wannaSearch;
+    
+				do 
+				{
+       	 			printf("\n\nÈÝëåôå íá ðñáãìáôïðïéÞóåôå êÜðïéá áíáæÞôçóç ìÝóá óôç ÂÜóç ÄåäïìÝíùí; (y/n)");
+       	 			printf("\nÁðÜíôçóç: ");
+        			scanf(" %c", &wannaSearch);
+        			getchar(); //Êáèáñéóìüò ôïõ buffer
+
+        			wannaSearch = toupper(wannaSearch); //ÌåôáôñïðÞ ôçò åéóüäïõ óå êåöáëáßá
+
+					while (wannaSearch != 'Y' && wannaSearch != 'N') // ÅðáíÜëçøç ìÝ÷ñé íá ëÜâåé Ýãêõñç áðÜíôçóç
+        			{
+            			printf("\nËÜèïò åéóáãùãÞ. Ðáñáêáëþ åéóÜãåôå 'y' Þ 'n'.\n");
+            			printf("\nÁðÜíôçóç: ");
+            			scanf(" %c", &wannaSearch);
+            			getchar();
+           				wannaSearch = toupper(wannaSearch);
+       				}
+        			if (wannaSearch == 'Y') 
+					{
+           				system("cls");
+            			printf("Ðáñáêáëþ äþóôå ôï ïíïìáôåðþíõìï åíüò ìáèçôÞ ðñïò áíáæÞôçóç\n");
+
+            			char nameOfStudent[50];
+            			char surnameOfStudent[50];
+						checkString("ÅéóÜãåôå ¼íïìá: ", nameOfStudent); // ÊëÞóç óõíÜñôçóçò ãéá åßóïäï ïíüìáôïò
+						checkString("ÅéóÜãåôå Åðßèåôï: ", surnameOfStudent); // ÊëÞóç óõíÜñôçóçò ãéá åßóïäï åðéèÝôïõ
+					
+            	
+            			int studentFound = 0; // ÌåôáâëçôÞ ãéá ôïí Ýëåã÷ï áí âñÝèçêå ï ìáèçôÞò
+            			for (int i = 0; i < numberOfStudents; i++) 
+						{
+                			if (strcmp(nameOfStudent, students[i].name) == 0 && strcmp(surnameOfStudent, students[i].surname) == 0) 
+							{
+                    		printf("\nStudent found:\n\n");
+                    		printf("Name: %s\n", students[i].name);
+                    		printf("Surname: %s\n", students[i].surname);
+                    		printf("V.Grade: %.2f\n", students[i].vGrade);
+                    		printf("W.Grade: %.2f\n", students[i].wGrade);
+                    		printf("Average: %.2f\n\n", students[i].average);
+                    		studentFound = 1;
+                    		break; // ¸îïäïò áðü ôçí åðáíÜëçøç áí âñåèåß ï ìáèçôÞò
+                			}
+            			}
+						if (!studentFound) 
+							printf("\nÏ ìáèçôÞò %s %s äåí õðÜñ÷åé...\n\n",nameOfStudent,surnameOfStudent);
+            		
+        			} 
+					else if (wannaSearch != 'N') 
+						printf("Invalid input. Please enter 'y' or 'n'.\n");
+        		
+
+    			} while (wannaSearch == 'Y'); // ÓõíÝ÷éóç ôçò äéáäéêáóßáò åÜí ï ÷ñÞóôçò åðéëÝîåé íá óõíå÷ßóåé ôçí áíáæÞôçóç
+}
+void searchForStudentGr(Student students[], int numberOfStudents) 
+{    
+	char wannaSearch;
+    
+				do                     //////Äåí ðåñéÝ÷åé åëÝã÷ïõò//////
+				{
+       	 			printf("\n\nÈÝëåôå íá ðñáãìáôïðïéÞóåôå êÜðïéá áíáæÞôçóç ìÝóá óôç ÂÜóç ÄåäïìÝíùí; (y/n)");
+       	 			printf("\nÁðÜíôçóç: ");
+        			scanf(" %c", &wannaSearch);
+        			getchar(); //Êáèáñéóìüò ôïõ buffer
+
+        			wannaSearch = toupper(wannaSearch); //ÌåôáôñïðÞ ôçò åéóüäïõ óå êåöáëáßá
+
+					while (wannaSearch != 'Y' && wannaSearch != 'N') // ÅðáíÜëçøç ìÝ÷ñé íá ëÜâåé Ýãêõñç áðÜíôçóç
+        			{
+            			printf("\nËÜèïò åéóáãùãÞ. Ðáñáêáëþ åéóÜãåôå 'y' Þ 'n'.\n");
+            			printf("\nÁðÜíôçóç: ");
+            			scanf(" %c", &wannaSearch);
+            			getchar();
+           				wannaSearch = toupper(wannaSearch);
+       				}
+        			if (wannaSearch == 'Y') 
+					{
+           				system("cls");
+            			printf("Ðáñáêáëþ äþóôå ôï ïíïìáôåðþíõìï åíüò ìáèçôÞ ðñïò áíáæÞôçóç\n");
+
+            			char nameOfStudent[50];
+            			char surnameOfStudent[50];
+            			printf("¼íïìá: ");
+            			scanf("%s", nameOfStudent);
+						printf("Åðßèåôï: ");
+						scanf("%s", surnameOfStudent);
+						
+            			int studentFound = 0; // ÌåôáâëçôÞ ãéá ôïí Ýëåã÷ï áí âñÝèçêå ï ìáèçôÞò
+            			for (int i = 0; i < numberOfStudents; i++) 
+						{
+                			if (strcmp(nameOfStudent, students[i].name) == 0 && strcmp(surnameOfStudent, students[i].surname) == 0) 
+							{
+                    		printf("\nStudent found:\n\n");
+                    		printf("Name: %s\n", students[i].name);
+                    		printf("Surname: %s\n", students[i].surname);
+                    		printf("V.Grade: %.2f\n", students[i].vGrade);
+                    		printf("W.Grade: %.2f\n", students[i].wGrade);
+                    		printf("Average: %.2f\n\n", students[i].average);
+                    		studentFound = 1;
+                    		break; // ¸îïäïò áðü ôçí åðáíÜëçøç áí âñåèåß ï ìáèçôÞò
+                			}
+            			}
+						if (!studentFound) 
+							printf("\nÏ ìáèçôÞò %s %s äåí õðÜñ÷åé...\n\n",nameOfStudent,surnameOfStudent);
+            		
+        			} 
+					else if (wannaSearch != 'N') 
+						printf("Invalid input. Please enter 'y' or 'n'.\n");
+        		
+
+    			} while (wannaSearch == 'Y'); // ÓõíÝ÷éóç ôçò äéáäéêáóßáò åÜí ï ÷ñÞóôçò åðéëÝîåé íá óõíå÷ßóåé ôçí áíáæÞôçóç
+}
+void statusBar() 
+{
+    system("chcp 437 > nul"); //ÁëëáãÞ ôïõ êùäéêïý system ãéá íá äïõëÝøåé ôï óùóôü ASCII  
+    system("cls");  
+
+    for (int i = 0; i <= 100; ++i) {
+        
+        printf("\rStatus: %3d%% [", i); // Åêôýðùóç ôïõ ðïóïóôïý ðñïüäïõ
+        int pos = i / 2; 				// Õðïëïãéóìüò ôçò èÝóçò ôçò ìðÜñáò ðñïüäïõ
+        for (int j = 0; j < 50; ++j) { // ÅðáíÜëçøç ãéá ôçí åêôýðùóç ôçò ìðÜñáò
+            if (j < pos) {
+                printf("%c", 219); // Åêôýðùóç ôïõ ãåìÜôïõ ôåôñáãþíïõ üôáí ç èÝóç åßíáé ìÝóá óôï êáëõðôüìåíï åýñïò
+            } else {
+                printf(" "); // Åêôýðùóç êåíïý üôáí ç èÝóç åßíáé åêôüò ôïõ êáëõðôüìåíïõ åýñïõò
+            }
+        }
+        printf("]"); 
+        usleep(9000); // Ðáýóç
+    }
+
+    printf("\nDone! Press any key to continue...");
+    getchar(); // ÁíáìïíÞ ãéá ïðïéïäÞðïôå ðëÞêôñï ãéá íá óõíå÷ßóåé
+    system("cls");  
+    system("chcp 1253 > nul");  //ÁëëáãÞ ôïõ êùäéêïý system ãéá íá äïõëÝøïõí ôá õðüëïéðá 
+}
+void loopAndPrintEn(Student students[], int numberOfStudents)
+{
+	for (int i = 0; i < numberOfStudents; i++) 
+				{
+					printf("%dïò ÌáèçôÞò",i+1);
+					printf("\n__________________");
+       				checkString("\n\t¼íïìá: ",students[i].name); // Êáëåß ôç óõíÜñôçóç ãéá ôïí Ýëåã÷ï êáé åéóáãùãÞ ïíüìáôïò
+       				checkString("\tÅðþíõìï: ",students[i].surname); // Êáëåß ôç óõíÜñôçóç ãéá ôïí Ýëåã÷ï êáé åéóáãùãÞ åðéèÝôïõ 
+					        
+					// ÅðáíÜëçøç ãéá ôçí åéóáãùãÞ ôïõ ðñïöïñéêïý âáèìïý ìå Ýëåã÷ï ïñßùí
+					do{
+						printf("\tÐñïöïñéêüò âáèìüò ôïõ/ôçò %s %s óôç C++ (áðü 0 þò êáé 10):",students[i].name,students[i].surname);
+            			students[i].vGrade = floatAfterCheck(" "); // Êáëåß ôç óõíÜñôçóç ãéá ôçí åéóáãùãÞ êáé Ýëåã÷ï ôïõ âáèìïý
+            			if (students[i].vGrade < 0 || students[i].vGrade > 10) 
+                			printf("\nËÜèïò åéóáãùãÞ. Ï âáèìüò ðñÝðåé íá åßíáé ìåôáîý 0 êáé 10.\n");
+            			} while (students[i].vGrade < 0 || students[i].vGrade > 10);
+
+					do {
+						printf("\tÃñáðôüò âáèìüò ôïõ/ôçò %s %s óôç C++ (áðü 0 þò êáé 10):",students[i].name,students[i].surname);
+            			students[i].wGrade = floatAfterCheck(" ");
+            			if (students[i].wGrade < 0 || students[i].wGrade > 10) 
+                		
+                			printf("\nËÜèïò åéóáãùãÞ. Ï âáèìüò ðñÝðåé íá åßíáé ìåôáîý 0 êáé 10.\n");
+						
+            			} while (students[i].wGrade < 0 || students[i].wGrade > 10);
+
+					students[i].average = (students[i].vGrade * 0.4 + students[i].wGrade * 0.6); // Õðïëïãéóìüò ôïõ ìÝóïõ üñïõ
+					
+					printf("\n");
+				
+    			
+    			}
+        		statusBar(); // Êáëåß ôç óõíÜñôçóç ãéá ôçí åìöÜíéóç ìðÜñáò ðñïüäïõ
+        	
+				printf("\n\n");
+   				 				//Åêôõðþíåé ôïí ðßíáêá ìå ôá óôïé÷åßá ôùí ìáèçôþí ðñéí ôçí ôáîéíüìçóç
+    			printf(" %s \n", dashes);
+				printf("|\t\t\t   ÌÇ ÔÁÎÉÍÏÌÇÌ¸ÍÏÓ ÐºÍÁÊÁÓ\t\t\t\t       |\n");
+				printf(" %s \n", dashes); 
+    			printf("|                                    Ðßíáêáò %d ìáèçôþí                                 |\n",numberOfStudents);
+    			printf(" %s \n", dashes);
+    			printf("| ¼íïìá            Åðþíõìï           Ðñ.Âáèìüò          Ãñ.Âáèìüò          Ì.¼ñïò      |\n");
+   				 printf(" %s \n", dashes);
+    			for (int i = 0; i < numberOfStudents; i++) 
+				{
+        			printStudent(&students[i]); // Êáëåß ôç óõíÜñôçóç ãéá ôçí åêôýðùóç ôùí óôïé÷åßùí êÜèå ìáèçôÞ
+   				}
+				printf("|                                                                                      |\n");
+    			printf(" %s \n\n\n\n", dashes);
+	
+    			bubbleSort(students, numberOfStudents); // Êáëåß ôç óõíÜñôçóç ãéá ôçí ôáîéíüìçóç ôùí ìáèçôþí
+    
+				printf("\n");  
+				 				// Åêôõðþíåé ôïí ðßíáêá ìå ôá óôïé÷åßá ôùí ìáèçôþí ìåôÜ ôçí ôáîéíüìçóç
+				printf(" %s \n", dashes);
+    			printf("|\t\t\t      ÔÁÎÉÍÏÌÇÌ¸ÍÏÓ ÐºÍÁÊÁÓ\t\t\t\t       |\n");
+				printf(" %s \n", dashes); 
+    			printf("|                                    Ðßíáêáò %d ìáèçôþí                                 |\n",numberOfStudents);
+    			printf(" %s \n", dashes);
+    			printf("| ¼íïìá            Åðþíõìï           Ðñ.Âáèìüò          Ãñ.Âáèìüò          Ì.¼ñïò      |\n");
+   				 printf(" %s \n", dashes);
+    			for (int i = 0; i < numberOfStudents; i++) 
+				{
+        			printStudent(&students[i]);
+    			}
+				printf("|                                                                                      |\n");
+    			printf(" %s \n\n\n\n", dashes);
+				
+}
+
+void loopAndPrintGr(Student students[], int numberOfStudents)
+{
+	for (int i = 0; i < numberOfStudents; i++) 
+				{
+					printf("%dïò ÌáèçôÞò",i+1);
+					printf("\n__________________");
+       												//ÅéóáãùãÞ óôïé÷åßùí//
+				   	printf("\n\t¼íïìá: ");
+        			scanf("%s", students[i].name);
+					printf("\tÅðþíõìï: ");
+        			scanf("%s", students[i].surname);
+  					printf("\tÐñïöïñéêüò âáèìüò ôïõ/ôçò %s %s óôç C++ (áðü 0 þò êáé 10): ",students[i].name,students[i].surname);
+    				scanf("%f", &students[i].vGrade);
+			
+				 	printf("\tÃñáðôüò âáèìüò óôç C++ (áðü 0 þò êáé 10): ");
+    				scanf("%f", &students[i].wGrade);
+					students[i].average = (students[i].vGrade * 0.4 + students[i].wGrade * 0.6);// Õðïëïãéóìüò ôïõ ìÝóïõ üñïõ
+					printf("\n");
+    			}
+        		statusBar(); // Êáëåß ôç óõíÜñôçóç ãéá ôçí åìöÜíéóç ìðÜñáò ðñïüäïõ
+        
+				printf("\n\n");
+				//Åêôõðþíåé ôïí ðßíáêá ìå ôá óôïé÷åßá ôùí ìáèçôþí ðñéí ôçí ôáîéíüìçóç
+    			printf(" %s \n", dashes);	
+				printf("|\t\t\t   ÌÇ ÔÁÎÉÍÏÌÇÌ¸ÍÏÓ ÐºÍÁÊÁÓ\t\t\t\t       |\n");
+				printf(" %s \n", dashes); 
+    			printf("|                                    Ðßíáêáò %d ìáèçôþí                                 |\n",numberOfStudents);
+    			printf(" %s \n", dashes);
+    			printf("| ¼íïìá            Åðþíõìï           Ðñ.Âáèìüò          Ãñ.Âáèìüò          Ì.¼ñïò      |\n");
+   				printf(" %s \n", dashes);
+   				
+    			for (int i = 0; i < numberOfStudents; i++) 
+				{
+        			printStudent(&students[i]);// Êáëåß ôç óõíÜñôçóç ãéá ôçí åêôýðùóç ôùí óôïé÷åßùí êÜèå ìáèçôÞ
+   				}
+				printf("|                                                                                      |\n");
+    			printf(" %s \n\n\n\n", dashes);
+	
+				
+
+    			bubbleSort(students, numberOfStudents);// Êáëåß ôç óõíÜñôçóç ãéá ôçí ôáîéíüìçóç ôùí ìáèçôþí
+    
+				printf("\n");
+								// Åêôõðþíåé ôïí ðßíáêá ìå ôá óôïé÷åßá ôùí ìáèçôþí ìåôÜ ôçí ôáîéíüìçóç
+				printf(" %s \n", dashes);
+    			printf("|\t\t\t      ÔÁÎÉÍÏÌÇÌ¸ÍÏÓ ÐºÍÁÊÁÓ\t\t\t\t       |\n");
+				printf(" %s \n", dashes); 
+    			printf("|                                    Ðßíáêáò %d ìáèçôþí                                 |\n",numberOfStudents);
+    			printf(" %s \n", dashes);
+    			printf("| ¼íïìá            Åðþíõìï           Ðñ.Âáèìüò          Ãñ.Âáèìüò          Ì.¼ñïò      |\n");
+   				printf(" %s \n", dashes);
+    			for (int i = 0; i < numberOfStudents; i++) 
+				{
+        			printStudent(&students[i]);
+    			}
+				printf("|                                                                                      |\n");
+    			printf(" %s \n\n\n\n", dashes);			
+				
+}
+
+void writeToFile(Student *students, int numberOfStudents, char *filename) 
+{
+    FILE *file = fopen(filename, "w"); // Áíïßãåé Ýíá áñ÷åßï ãéá åããñáöÞ (w)
+    
+    if (file == NULL) // ¸ëåã÷ïò áí ôï áñ÷åßï äåí Üíïéîå óùóôa
+	{
+        printf("Failed to open file");
+        return;
+    }
+	// Åêôýðùóç åðéêåöáëßäùí ôïõ ðßíáêá ìå ôá óôïé÷åßá ôùí ìáèçôþí	
+    fprintf(file, " %s \n", dashes);
+    fprintf(file, "|                                 Ðßíáêáò %d ìáèçôþí                                    |\n",numberOfStudents);
+    fprintf(file, " %s \n", dashes);
+    fprintf(file, "| ¼íïìá            Åðþíõìï           Ðñ.Âáèìüò          Ãñ.Âáèìüò          Ì.¼ñïò      |\n");
+    fprintf(file, " %s \n", dashes);
+    
+    for (int i = 0; i < numberOfStudents; i++) 
+	{
+        fprintf(file, "|  %-15s   %-15s   %-15.2f   %-15.2f   %-12.2f|\n", 
+        students[i].name, students[i].surname, students[i].vGrade, students[i].wGrade, students[i].average);
+    }
+    
+    fprintf(file, " %s \n", dashes);
+    fclose(file);// Êëåßóéìï ôïõ áñ÷åßïõ ìåôÜ ôçí ïëïêëÞñùóç ôçò åããñáöÞò
+}
+void saveRandomStudentList(Student students[], int numberOfStudents)
+{
+	srand(time(NULL));//Ãéá íá äïõëÝøåé ç rand
+    int randomChoice = rand() % 2; // Äçìéïõñãßá åíüò ôõ÷áßïõ áñéèìïý 0 Þ 1
+
+    if (randomChoice == 0) 
+	{
+		// Åêôýðùóç ìçíýìáôïò ãéá ôçí áðïèÞêåõóç ôçò âÜóçò äåäïìÝíùí ÷ùñßò ôáîéíüìçóç
+        printf("Ç ÂÜóç ÄåäïìÝíùí áðïèçêåýôçêå óôïí ôñÝ÷ïíôá öÜêåëï, ìå áýîïõóá ôáîéíüìçóç þò ðñïò ôï ÌÝóï ¼ñï.\n");
+        writeToFile(students, numberOfStudents, "_students.txt");// Êáëåß ôç óõíÜñôçóç ãéá ôçí áðïèÞêåõóç ôùí äåäïìÝíùí óå áñ÷åßï
+    } 
+	else 
+	{
+		// Åêôýðùóç ìçíýìáôïò ãéá ôçí áðïèÞêåõóç ôçò âÜóçò äåäïìÝíùí ìåôÜ áðü ôáîéíüìçóç
+        printf("Ç ÂÜóç ÄåäïìÝíùí áðïèçêåýôçêå óôïí ôñÝ÷ïíôá öÜêåëï, ìå áýîïõóá ôáîéíüìçóç þò ðñïò ôï ÌÝóï ¼ñï.\n");
+        bubbleSort(students, numberOfStudents); // Êáëåß ôç óõíÜñôçóç ãéá ôçí ôáîéíüìçóç ôùí ìáèçôþí áíÜëïãá ìå ôïí ìÝóï üñï
+        writeToFile(students, numberOfStudents, "_students.txt");// Êáëåß ôç óõíÜñôçóç ãéá ôçí áðïèÞêåõóç ôùí äåäïìÝíùí óå áñ÷åßï
+    }
+}
+
+int main() 
+{
+	system("chcp 1253 > nul");
+	
+	int numberOfStudents;
+//  ÆçôÜ áðü ôïí ÷ñÞóôç íá åéóÜãåé ôïí áñéèìü ôùí ìáèçôþí ðïõ èá Ý÷åé ç ôÜîç
+	do
+	{
+		numberOfStudents = intAfterCheck("Ðüóïõò ìáèçôÝò èá Ý÷åé ç ôÜîç óáò; ");// Êáëåß ôç óõíÜñôçóç ãéá ôçí åéóáãùãÞ åíüò áêåñáßïõ ìå Ýëåã÷ï
+		if(numberOfStudents==0) // ÅÜí äïèåß 0, åìöáíßæåôáé ìÞíõìá ëÜèïõò êáé æçôåßôáé åê íÝïõ ç åéóáãùãÞ
+			printf("\nÐñÝðåé íá äùèåß èåôéêüò áñéèìüò...\n\n");
+					
+	}while(numberOfStudents <= 0);	// Ç åðáíÜëçøç óõíå÷ßæåôáé ìÝ÷ñé íá ëçöèåß Ýíáò èåôéêüò áñéèìüò	
+	
+   //×ñÞóç óõíÜñôçóçò calloc ãáé ôçí äÝóìåõóç ìíÞìçò
+    Student *students = (Student*) calloc(numberOfStudents, sizeof(Student));
+     
+	printf("\nÈá ðëçêôñïëïãÞóåôå ïíïìáôåðþíõìá ìå ÁÌÉÃÙÓ ëáôéíéêÜ ãñÜììáôá Þ èá ðåñéÝ÷ïíôáé êáé åëëçíéêÜ ãñÜììáôá? \n\nÐáôÞóôå 1 ãéá ËáôéíéêÜ Þ 0 ãéá ÅëëçíéêÜ \n\nÓÇÌÅÉÙÓÇ: Óå ðåñßðôùóç ðïõ åðéëÝîåôå ÅëëçíéêÜ, äå èá åßíáé äõíáôüò êáíÝíáò Ýëåã÷ïò ãéá åêõñüôçôá ïíïìÜôùí.\n");
+
+	int langChoice;
+     do {
+     	langChoice = intAfterCheck("\nÅéóÜãåôáé ôçí åðéëïãÞ óáò: ");
+       
+        // ÅëÝã÷åé áí ç åßóïäïò åßíáé åßôå 0 åßôå 1
+        if (langChoice == 0 || langChoice == 1) {
+            break;  // Âãáßíåé áðü ôçí åðáíÜëçøç áí ç åßóïäïò åßíáé Ýãêõñç
+        }
+
+        printf("Ìç Ýãêõñç åðéëïãÞ. Ïé åðéôñåðôÝò ôéìÝò åßíáé ôï 0 êáé ôï 1.\n");
+    } while (1);  // Óõíå÷ßæåé íá æçôÜåé åßóïäï ìÝ÷ñé íá ëçöèåß Ýãêõñç ôéìÞ
+
+
+
+	
+	switch(langChoice)
+	{
+		case 1:
+			{
+				
+				setlocale(LC_ALL, "en_US.utf8"); //ÅíôïëÞ ãéá áããëéêÜ
+				system("cls");
+				loopAndPrintEn(students, numberOfStudents);
+				saveRandomStudentList(students, numberOfStudents);
+				searchForStudentEn(students, numberOfStudents);
+				printf("\nGoodbye!\n");
+            	break;
+			}
+			
+			case 0:
+				{
+				setlocale(LC_ALL, "el_GR.utf8"); //ÅíôïëÞ ãéá åëëçíéêÜ
+				system("cls");
+				loopAndPrintGr(students, numberOfStudents);
+				saveRandomStudentList(students, numberOfStudents);
+    			searchForStudentGr(students, numberOfStudents);
+				printf("\nGoodbye!\n");
+				break;
+				}
+			default:
+            	printf("Invalid choice.\n");
+           		return 1; 
+            
+	}
+	free(students); //ÁðïäÝóìåõóç ìíÞìçò
+	return 0;
+}
+
+
+
